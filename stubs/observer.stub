@@ -1,0 +1,13 @@
+<?php
+namespace {namespace}Observers;
+
+use Vesaka\Core\Abstracts\BaseObserver;
+/**
+ * Description of {entity}Observer
+ *
+ * @author Vesaka
+ */
+class {entity}Observer extends BaseObserver {
+    
+}
+

@@ -1,0 +1,13 @@
+<?php
+namespace {namespace}Database\Interfaces;
+
+use Vesaka\Core\Abstracts\BaseInterface;
+
+/**
+ *
+ * @author Vesaka
+ */
+interface {entity}Interface extends BaseInterface {
+    //put your code here
+}
+

@@ -1,0 +1,14 @@
+<?php
+
+namespace {namespace}Policies;
+
+use Vesaka\Core\Abstracts\BasePolicy;
+
+/**
+ * Description of {entity}Policy
+ *
+ * @author Vesaka
+ */
+class {entity}Policy extends BasePolicy {
+    //put your code here
+}

@@ -1,0 +1,15 @@
+<?php
+
+namespace {namespace}Database\Repositories;
+use Vesaka\Core\Abstracts\BaseRepository;
+use {namespace}Database\Interfaces\{entity}Interface;
+
+/**
+ * Description of {entity}Repository
+ *
+ * @author Vesaka
+ */
+class {entity}Repository extends BaseRepository implements {entity}Interface {
+    //put your code here
+}
+
