@@ -4,6 +4,7 @@ namespace Vesaka\Core\Collections;
 
 use Illuminate\Database\Eloquent\Collection;
 use Vesaka\Core\Models\Category;
+use Illuminate\Support\Str;
 
 /**
  * Description of CategoryCollection
@@ -24,6 +25,7 @@ class CategoryCollection extends Collection {
         $item = new Category;
         $item->id = $category->id;
         $item->name = $category->name;
+        $item->title = Str::of($category->name)->replace('-', ' ')->title()->toString();
         $item->slug = $category->slug;
         $item->pid = $category->parent_id;
         $item->dragDisabled = $category->draggable;
