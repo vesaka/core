@@ -2,11 +2,16 @@
 
 namespace Vesaka\Core\Http\Controllers\Admin;
 
+use Illuminate\Http\Request;
+
 /**
- * Description of UserController
+ * Description of WebsiteController
  *
  * @author vesak
  */
-class ImageController extends ModelController {
-    
+class WebsiteController extends ModelController {
+    protected string $type = 'website';
+    public function datatable(Request $request) {
+        return app('website')->datatable($request);
+    }
 }
