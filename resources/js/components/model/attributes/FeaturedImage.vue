@@ -1,5 +1,5 @@
 <template>
-    <div id="cropper" class="mx-auto">
+    <div id="cropper" class="mx-auto bg-grey-300 bg-card-texture">
         <vue-cropper
             ref="cropper"
             :src="imgSrc"
@@ -11,19 +11,19 @@
             :auto-crop="true"
             :auto-crop-area="0.9"
             :container-style="styles"
-            class="h-64 w-64 mx-auto"
+            class="h-64 w-auto mx-auto"
             @crop="cropUpdated"
             @ready="cropperIsReady"
             ></vue-cropper>
 
         <div class="text-center">
-            <div class="overflow-hidden relative w-64 mx-auto my-4">
+            <div class="overflow-hidden relative w-full mx-auto my-4">
                 <button :class="btnUpload">
                     <svg xmlns="http://www.w3.org/2000/svg" :class="iconClass" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                 </button>
-                <input class="cursor-pointer absolute top-0 block py-1 px-4 w-full opacity-0 pin-r pin-t"
+                <input class="cursor-pointer absolute top-0 block py-1 w-full opacity-0 pin-r pin-t"
                        type="file"
                        accept="image/*"
                        @change="selectedFile"/>
@@ -106,7 +106,7 @@
         emits: ['update:file', 'update:crop'],
         props: {
             file: {
-                type: Object
+                type: [Object, String]
             },
             crop: {
                 type: [String, Object],
@@ -149,7 +149,8 @@
             },
             btnUpload() {
                 return Object.assign({}, this.btnClass, {
-                    'rounded w-64 md:w32 mx-auto cursor-pointer text-center': true
+                    'rounded w-full mx-auto cursor-pointer text-center': true,
+                    'cursor-pointer': true
                 });
             },
             iconClass() {
@@ -170,7 +171,9 @@
                     this.booted = true;
                     let crop;
                     try {
-                        crop = JSON.parse(this.crop);
+                        
+                        crop = typeof this.crop === 'string' ? JSON.parse(this.crop) : this.crop;
+                        console.log(crop);
                     } catch (e) {
                         crop = env.gallery.crop;
                     }
@@ -204,12 +207,6 @@
         },
         mounted() {
             this.imgSrc = this.src;
-
-
-
-
-
-            //$on('edit-image', this.setImageData);
         }
     }
 </script>

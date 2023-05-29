@@ -12,7 +12,7 @@
                     </div>
                     <div :class="formGroup">
                         <h2 :class="labelClass">Description</h2>
-                        <description v-model="model.content"></description>
+                        <Description v-model="model.content" :value="model.content"></Description>
                         <span :class="errorClass"></span>
                     </div>
                 </div>
@@ -20,15 +20,16 @@
                     <featured-image v-model:file="model.file"
                                     v-model:crop="model.crop"
                                     v-model:src="model.imgSrc"
+                                    v-if="'cropper' === props.uploader"
                                     ></featured-image>
+                    <FilePond v-if="'filepond' === props.uploader" @flleid-created="fileUploaded"></FilePond>
                     <div :class="formGroup">
                         <h2 :class="labelClass">Tags</h2>
-                        <tags v-model="model.meta.tags"></tags>
-                        <!--                        <span :class="errorClass" v-validate:post.tags="`required::Tags are required`"></span>-->
+                        <tags v-model="model.meta.tags" :value="tags"></tags>
                     </div>
                     <div :class="formGroup">
                         <h2 :class="labelClass">Category</h2> 
-                        <Categories :items="categoriesItems" v-model="model.category"></Categories>
+                        <Categories :items="categoriesItems" :value="checkedCategories" v-model="model.category"></Categories>
                         <span :class="errorClass"></span>
                     </div>
                 </div>
@@ -37,59 +38,75 @@
             <slot name="meta"/>
         </div>
         <div>
-            <upload-button @click="save" :disabled="loading"></upload-button>
+            <upload-button @click="save" :disabled="loading">
+                <template #after>
+                    Loading...
+                </template>
+            </upload-button>
         </div>
+        <Notifications position="bottom right">
+            SAVED!  
+        </Notifications>
     </section>
 </template>
 <script setup>
     import { reactive, watch, computed, onBeforeMount } from 'vue';
+    import Notifications, { useNotification  } from '@kyvg/vue3-notification';
+    import { useToast } from "vue-toastification";
     import Description from './attributes/Description.vue';
     import Tags from './attributes/Tags.vue';
-    import Category from './attributes/Category.vue';
     import Categories from './attributes/Categories.vue';
     import FeaturedImage from './attributes/FeaturedImage.vue';
+    import FilePond from './attributes/FilePond.vue';
     import Gallery from './attributes/Gallery.vue';
     import ValidationMixin from '../mixins/main/validation-mixin';
     import ClassMixin from '../mixins/main/class-mixin';
     import UploadButton from '../global/UploadButton.vue';
-
+//    import Spinnner from '../global/Spinner.vue';
     import axios from 'axios';
+
+    import { faker } from '@faker-js/faker';
     const props = defineProps({
         type: {
             type: String,
             default: 'model'
+        },
+        alias: {
+            type: String,
+            default: ''
+        },
+        uploader: {
+            type: String,
+            default: 'cropper'
         },
         saveUrl: {
             type: String,
             default: '/admin/{type}'
         }
     });
-    
-    
+
+    const {notify} = useNotification();
+    const toast = useToast();
 
     let saving = false;
     const model = reactive({
         id: 0,
-        title: 'test',
+        title: faker.lorem.sentence(3),
+        alias: props.alias,
         name: '',
-        type: 'model',
-        content: 'test',
-        category_id: 0,
+        type: props.type,
+        content: faker.lorem.sentence(),
         categories: [],
         category: [],
         fileIds: [],
         meta: {},
         crop: {},
         file: null,
-        gallery: []
+        gallery: [],
+        imgSrc: ''
 
     });
-    watch(model, (n, o) => {
-        console.log(n.category);
-        if (n.category !== o.category) {
-            console.log(n.category);
-        }
-    });
+
     const loading = computed(() => {
         return true === saving;
     });
@@ -106,7 +123,6 @@
                 const obj = model[key];
 
                 for (let name in obj) {
-                    console.log(obj[name]);
                     formData.append(`${key}[${name}]`, obj[name]);
                 }
 
@@ -116,53 +132,33 @@
 
         axios.post(route(`admin::${model.type}.store`), formData, {headers: {
                 "Content-Type": "multipart/form-data",
-            }})
-                .then(response => {
-                    //model = Object.assign(model, response.model);
-                })
-                .catch(error => {
+            }}).then(response => {
 
+            toast("Saved Successfuly");
+
+            model.id = response.data.model.id;
+        }).catch(error => {
+                    toast.error("NOT SAVED");
                 }).then(() => {
             saving = false;
-        })
+        });
     };
 
-    const threeOptions = computed({
-        events: {
-            expanded: {
-                state: true,
-                fn: null
-            },
-            selected: {
-                state: false,
-                fn: null
-            },
-            checked: {
-                state: false,
-                fn: null
-            },
-            editableName: {
-                state: false,
-                fn: null,
-                calledEvent: null
-            }
-        },
-        addNode: {state: false, fn: null, appearOnHover: false},
-        editNode: {state: false, fn: null, appearOnHover: false},
-        deleteNode: {state: false, fn: null, appearOnHover: false},
-        showTags: false
-    });
-    
+    const fileUploaded = (id) => {
+        model.fileID = id;
+    }
+
     const categoriesItems = computed(() => {
         if (!Array.isArray($categories)) {
             return [];
         }
-        
+
         const fn = (category, depth = 0) => {
             const isParent = Array.isArray(category.children);
             const item = {
                 id: `${category.id}`,
                 name: category.name,
+                label: category.title,
                 type: isParent ? 'folder' : 'item',
                 checkedStatus: category.id === model.category,
                 data: {
@@ -176,7 +172,7 @@
 
             return item;
         };
-        
+
         return $categories.map(fn);
     });
 
@@ -234,12 +230,40 @@
     const errorClass = {
         'px-3 text-red-700': true
     };
-    
-    
+
+    const checkedCategories = computed(() => {
+        if (!Array.isArray($model.categories)) {
+            return [];
+        }
+        return $model.categories.reduce((result, item) => {
+            result.push({
+                id: item.id,
+                label: item.name
+            });
+            return result;
+        }, []);
+    });
+
+    const tags = computed(() => {
+        return $model.meta ? $model.meta.tags || [] : [];
+    });
+
 
     onBeforeMount(() => {
-        Object.assign(model, window[props.type] || {});
-        model.type = props.type;
+        for (let key in model) {
+            model[key] = $model[key] || '';
+        }
+        
+        if (!model.type) {
+            model.type = props.type;
+        }
+        
+        model.alias = props.alias;
+        if (Array.isArray($model.categories)) {
+            model.category = $model.categories.map(c => c.id);
+        }
+
+
     });
 
 

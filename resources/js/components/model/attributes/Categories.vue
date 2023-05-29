@@ -1,14 +1,17 @@
 <template>
-    <tree ref="tree"
-          :isCheckable="checkable"
-          :items="items"
-          v-model:checkedItems="selectedItems"></tree>
+    <Treeselect
+          :options="cetegories"
+          :multiple="true"
+          :modelValue="checkedItems"
+          value-consists-of="LEAF_PRIORITY"
+          @updated:modelValue="(v) => $emit('update:modelValue', v)"></Treeselect>
 </template>
 <script setup>
-    import { ref } from 'vue';
-    import Tree from 'vue3-tree-vue';
+    import { ref, computed } from 'vue';
+    import Treeselect from 'vue3-treeselect'
+    import 'vue3-treeselect/dist/vue3-treeselect.css'
 
-    const selectedItems = ref([]);
+    const checkedItems = ref([]);
     const props = defineProps({
         items: {
             type: Array,
@@ -24,10 +27,17 @@
             type: Boolean,
             default: true
         },
+        checkedItems: {
+            type: Array,
+            default: []
+        }
     });
-
-    const check = () => {
-
+    
+    const cetegories = computed(() => props.items);
+    
+    const select = (v) => {
+        console.log(v);
+        //$emit('update:modelValue')
     }
 
 </script>

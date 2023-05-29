@@ -19,6 +19,9 @@
         },
         components: {VueTagsInput},
         props: {
+            value: {
+                type: Array
+            },
             name: {
                 type: String,
                 default: ''
@@ -32,7 +35,8 @@
         },
         
         created() {
-
+            this.tags = this.value;
+            console.log(this.value);
         }
     }
 </script>
