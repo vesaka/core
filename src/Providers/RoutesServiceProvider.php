@@ -2,7 +2,6 @@
 
 namespace Vesaka\Core\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -11,9 +10,7 @@ use Illuminate\Support\Facades\Route;
  * @author vesak
  */
 class RoutesServiceProvider extends BaseServiceProvider {
-    
-    protected string $alias = 'admin';
-    
+        
     protected $routes = [
         'web' => [
             'middleware' => ['web'],

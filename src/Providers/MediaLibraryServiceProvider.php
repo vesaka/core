@@ -2,21 +2,22 @@
 
 namespace Vesaka\Core\Providers;
 
+use Illuminate\Support\ServiceProvider;
+
 /**
  * Description of MediaLibraryServiceProvider
  *
  * @author vesak
  */
-class MediaLibraryServiceProvider extends BaseServiceProvider {
+class MediaLibraryServiceProvider extends ServiceProvider {
    
     public function boot() {
-        $conversions = config('frontend.gallery.conversions');
-        if (!is_countable($conversions)) {
-            return;
+        if (!defined('FEATURED_IMAGE')) {
+            define('FEATURED_IMAGE', 'featured_image');
         }
     }
     
-    public function register($param) {
+    public function register() {
         
     }
 }

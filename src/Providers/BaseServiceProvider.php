@@ -22,13 +22,23 @@ class BaseServiceProvider extends ServiceProvider {
     protected array $providers = [];
     protected string $__dir__ = '';
     protected string $namespace = '';
+    
+    protected $routes = [
+        'web' => [
+            'middleware' => ['web', 'auth'],
+        ],
+        'api' => [
+            'middleware' => ['api']
+        ]
+    ];
 
 
     public function __construct($app) {
         parent::__construct($app);
-        
+        $reflection = new ReflectionClass(get_called_class());
         if (!$this->namespace) {
-            $this->namespace = Str::substr(__NAMESPACE__, 0, strpos(__NAMESPACE__, '\\Providers')) . '\\';
+            $ns = $reflection->getNamespaceName();
+            $this->namespace = Str::substr($ns, 0, strpos($ns, '\\Providers')) . '\\';
         }
         
         if ('core' === $this->title) {
@@ -36,7 +46,7 @@ class BaseServiceProvider extends ServiceProvider {
         } else if (!$this->alias) {
             $this->alias = $this->title;
         }
-        $reflection = new ReflectionClass(get_called_class());
+        
         $dir = str_replace('core', $this->title, dirname($reflection->getFileName()));
         config(["namespaces.$this->title" => str_replace('Providers', '', $reflection->getNamespaceName())]);
         $this->__dir__ = substr($dir, 0, strpos($dir, DIRECTORY_SEPARATOR . 'src') + 1);
@@ -54,6 +64,10 @@ class BaseServiceProvider extends ServiceProvider {
         foreach ($this->providers as $provider) {
             $this->app->register($provider);
         }
+    }
+    
+    public function setPath(string $path) {
+        $this->__dir__ = $path;
     }
     
     protected function includePackageClasses(string $path, Closure $callback) {
