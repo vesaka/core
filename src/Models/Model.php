@@ -3,10 +3,16 @@
 namespace Vesaka\Core\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
-use ActionDigital\Admin\Model\User;
+use Vesaka\Admin\Model\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Vesaka\Core\Models\Category;
+use Vesaka\Core\Models\Meta;
+use Illuminate\Http\Request;
+
+use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
+use Vesaka\Core\Traits\Models\CropperFeaturedImageTrait;
+use Vesaka\Core\Traits\Models\HasMetaTrait;
 
 /**
  * Description of Model
@@ -15,7 +21,7 @@ use Vesaka\Core\Models\Category;
  */
 class Model extends CoreModel {
 
-    use SoftDeletes;
+    use SoftDeletes, CropperFeaturedImageTrait, HasMetaTrait;
 
     protected $table = 'models';
     protected $fillable = ['author_id', 'title', 'content', 'type', 'status', 'name'];
@@ -24,6 +30,8 @@ class Model extends CoreModel {
         'type' => 'model',
         'status' => 'pending'
     ];
+    
+    protected $metables = ['tags'];
 
     public function author() {
         return $this->belongsTo(User::class);
@@ -31,19 +39,28 @@ class Model extends CoreModel {
 
     public function categories() {
         return $this->morphToMany(Category::class, 'relation', 'relations', 'relation_id', 'model_id')
-                        ->where('relation_type', self::class);
+                        ->where('relation_type', get_called_class());
     }
 
     public function syncCategories(array $ids = []) {
-        return $this->categories()->syncWithPivotValues($ids, [
+        $this->categories()->syncWithPivotValues($ids, [
                     'model_type' => Category::class,
                     'name' => 'post-category',
                     'order' => 1
         ]);
+        
+        return $this;
+    }
+    public final function getType(): string {
+        if (isset($this->__type)) {
+            return $this->__type;
+        }
+        
+        return Str::of((new \ReflectionClass(get_called_class()))->getShortName())->slug();
     }
 
     public function related_posts() {
-        return $this->hasMany(self::class, 'type', 'type')->where('id', '!=', $this->id);
+        return $this->hasMany(get_called_class(), 'type', 'type')->where('id', '!=', $this->id);
     }
 
     public function setNameAttribute($value) {
@@ -107,5 +124,35 @@ class Model extends CoreModel {
                     'ratio' => 1
                         ], $data);
     }
+    
+    public function getPreviewAttribute() {
+        return $this->getFirstMediaUrl(FEATURED_IMAGE, 'medium');
+    }
+    
+    public function tags() {
+        return $this->hasMany(Meta::class, 'model_id', 'id')->where([
+            'type' => get_called_class(),
+            'name' => 'tags'
+        ]);
+    }
+    
+    public function setFeaturedImage(Request $request) {
+        $action = 0 < intval($request->id) ? 'update' : 'create';
+        $handler = '';
+        $traits = class_uses_recursive(get_class($this));
+        if (in_array(FilepondFeaturedImageTrait::class, $traits)) {
+            $handler = 'Filepond';
+        } else if(in_array(CropperFeaturedImageTrait::class, $traits)) {
+            $handler = 'Cropper';
+        }
+        
+        $method = "{$action}From{$handler}";
+        if (method_exists($this, $method)) {
+            $this->{$method}($request);
+        }
+        
+        return $this;
+    }
+    
 
 }
