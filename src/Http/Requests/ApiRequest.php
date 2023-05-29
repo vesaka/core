@@ -1,5 +1,5 @@
 <?php
-namespace ActionDigital\Core\Http\Requests;
+namespace Vesaka\Core\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Rule;
 /**
