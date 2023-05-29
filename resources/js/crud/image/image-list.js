@@ -1,6 +1,4 @@
 import { createApp } from 'vue';
-import ModelList from '@core/components/model/ModelList.vue'
+import ImageTable from '@core/components/image/ImageTable.vue'
 
-createApp(ModelList).mount('#image-list');
-
-
+createApp(ImageTable).mount('#website-list');
