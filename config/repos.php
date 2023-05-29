@@ -6,6 +6,7 @@ use Vesaka\Core\Database\Cache;
 use Vesaka\Core\Models;
 use Vesaka\Core\Observers;
 use Vesaka\Core\Policies;
+use Vesaka\Core\Resources;
 return [
     'category' => [
         'model' => Models\Category::class,
@@ -22,5 +23,22 @@ return [
         'interface' => Interfaces\ModelInterface::class,
         'observer' => Observers\ModelObserver::class,
         'policy' => Policies\ModelPolicy::class,
+    ],
+    'img' => [
+        'model' => Models\Image::class,
+        'repository' => Repositories\ImageRepository::class,
+        'cache' => Cache\ImageCache::class,
+        'interface' => Interfaces\ImageInterface::class,
+        'observer' => Observers\ImageObserver::class,
+        'policy' => Policies\ImagePolicy::class,
+        'resource' => Resources\ImageResource::class
+    ],
+    'website' => [
+        'model' => Models\Website::class,
+        'repository' => Repositories\WebsiteRepository::class,
+        'cache' => Cache\WebsiteCache::class,
+        'interface' => Interfaces\WebsiteInterface::class,
+        'observer' => Observers\WebsiteObserver::class,
+        'policy' => Policies\WebsitePolicy::class
     ],
 ];
