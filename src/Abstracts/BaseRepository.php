@@ -100,7 +100,7 @@ class BaseRepository implements BaseInterface {
     }
 
     public function remove($key) {
-        
+        $this->model->where('id', $key)->delete();
     }
 
     public function fetch(array $data = [], ...$columns) {
@@ -124,7 +124,7 @@ class BaseRepository implements BaseInterface {
 
     public function filter($request, $paginate = false) {
         $reflection = new ReflectionObject($this);
-        $name = ucfirst(Str::singular($this->model->getTable()));
+        $name = (new ReflectionClass($this->model))->getShortName();
         $namespace = $reflection->getNamespaceName();
         $baseNamespace = substr($namespace, 0, strpos($namespace, '\\Database'));
         $classFilter = "$baseNamespace\\Builders\\Filters\\" . $name . "Filter";

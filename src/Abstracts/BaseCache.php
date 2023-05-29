@@ -21,8 +21,9 @@ class BaseCache implements BaseInterface {
     protected $cache;
     protected $minutes = 1;
     protected $seconds = 60;
-    protected $name;
+    protected string $name;
     protected $tags = [];
+    protected string $plural;
 
     /**
      * 
