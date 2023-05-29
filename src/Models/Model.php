@@ -24,7 +24,7 @@ class Model extends CoreModel {
     use SoftDeletes, CropperFeaturedImageTrait, HasMetaTrait;
 
     protected $table = 'models';
-    protected $fillable = ['author_id', 'title', 'content', 'type', 'status', 'name'];
+    protected $fillable = ['author_id', 'title', 'content', 'type', 'status', 'name', 'parent'];
     protected $__locales;
     protected $attributes = [
         'type' => 'model',
