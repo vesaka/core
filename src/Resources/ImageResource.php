@@ -1,7 +1,9 @@
 <?php
+
 namespace Vesaka\Core\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+
 /**
  * Description of ImageResource
  *

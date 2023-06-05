@@ -2,8 +2,9 @@
 
 namespace Vesaka\Core\Models;
 
-use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
 use Illuminate\Support\Str;
+use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
+
 /**
  * Description of Website
  *
@@ -11,10 +12,9 @@ use Illuminate\Support\Str;
  */
 class Website extends Model {
     use FilepondFeaturedImageTrait;
-    
-    public function snap($url)
-    {
-        if (!empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+
+    public function snap($url) {
+        if (! empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
             $curl_init = curl_init("https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url={$url}&screenshot=true");
             curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($curl_init);
@@ -23,8 +23,8 @@ class Website extends Model {
             $googlepsdata = json_decode($response, true);
             //screenshot data
             $snap = Str::of($googlepsdata['screenshot']['data'])
-                    ->replace('_', '-')
-                    ->replace('/', '+');
+                ->replace('_', '-')
+                ->replace('/', '+');
 
             return $snap;
         } else {

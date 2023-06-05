@@ -2,15 +2,16 @@
 
 namespace Vesaka\Core\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Vesaka\Core\Traits\MetaTrait;
 
- 
-class User extends Authenticatable
-{
-    use Notifiable, HasApiTokens, MetaTrait, AclTraitneAware;
+class User extends Authenticatable {
+    use Notifiable;
+    use HasApiTokens;
+    use MetaTrait;
+    use AclTraitneAware;
 
     /**
      * The attributes that are mass assignable.
@@ -18,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'locale', 'timezone'
+        'name', 'email', 'password', 'locale', 'timezone',
     ];
 
     /**
@@ -38,32 +39,31 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    
+
     protected $collection = 'user';
-    
+
     protected $metables = [];
-    
+
     public function meta() {
-        
         return $this->hasMany('Vesaka\Core\Models\UserMeta', 'user_id', 'id');
     }
-    
+
     public function getLocaleAttribute() {
         if (isset($this->attributes['locale'])) {
             return $this->attributes['locale'];
         }
-        
+
         return config('app.locale');
     }
-    
+
     public function preferredLocale() {
-        return $this->locale; 
+        return $this->locale;
     }
-    
+
     public function getMetables() {
         return $this->metables;
     }
-    
+
     public function getTokenAttribute() {
         return $this->currentAccessToken()->plainTextToken;
     }

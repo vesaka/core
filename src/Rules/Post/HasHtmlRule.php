@@ -1,7 +1,9 @@
 <?php
+
 namespace Vesaka\Core\Rules\Post;
 
 use Illuminate\Contracts\Validation\Rule;
+
 /**
  * Description of HasHtmlRule
  *
@@ -14,7 +16,6 @@ class HasHtmlRule implements Rule {
     }
 
     public function passes($attribute, $value): bool {
-        return !empty(strip_tags($value));
+        return ! empty(strip_tags($value));
     }
-
 }

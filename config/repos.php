@@ -1,12 +1,13 @@
 <?php
 
-use Vesaka\Core\Database\Repositories;
-use Vesaka\Core\Database\Interfaces;
 use Vesaka\Core\Database\Cache;
+use Vesaka\Core\Database\Interfaces;
+use Vesaka\Core\Database\Repositories;
 use Vesaka\Core\Models;
 use Vesaka\Core\Observers;
 use Vesaka\Core\Policies;
 use Vesaka\Core\Resources;
+
 return [
     'category' => [
         'model' => Models\Category::class,
@@ -31,7 +32,7 @@ return [
         'interface' => Interfaces\ImageInterface::class,
         'observer' => Observers\ImageObserver::class,
         'policy' => Policies\ImagePolicy::class,
-        'resource' => Resources\ImageResource::class
+        'resource' => Resources\ImageResource::class,
     ],
     'website' => [
         'model' => Models\Website::class,
@@ -39,6 +40,6 @@ return [
         'cache' => Cache\WebsiteCache::class,
         'interface' => Interfaces\WebsiteInterface::class,
         'observer' => Observers\WebsiteObserver::class,
-        'policy' => Policies\WebsitePolicy::class
+        'policy' => Policies\WebsitePolicy::class,
     ],
 ];

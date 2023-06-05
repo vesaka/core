@@ -8,11 +8,10 @@ namespace Vesaka\Core\Traits\Providers;
  * @author vesak
  */
 trait CliProviderTrait {
-
     protected $packageCommands = [];
 
     protected function registerPackageCommands() {
-        if (!$this->app->runningInConsole()) {
+        if (! $this->app->runningInConsole()) {
             return;
         }
 
@@ -24,5 +23,4 @@ trait CliProviderTrait {
 
         $this->commands($this->packageCommands);
     }
-
 }

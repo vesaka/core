@@ -3,10 +3,9 @@
 namespace Vesaka\Core\Abstracts;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use ReflectionObject;
 use ReflectionClass;
+use ReflectionObject;
 
 /**
  * Description of EloquentAbstractRepository
@@ -14,7 +13,6 @@ use ReflectionClass;
  * @author User
  */
 class BaseRepository implements BaseInterface {
-
     protected $model;
 
     public function __construct(Model $model) {
@@ -42,16 +40,16 @@ class BaseRepository implements BaseInterface {
 
         if ($model->meta->isNotEmpty()) {
             $model->setRelation('meta', $model->meta->keyBy('key')
-                            ->map(function($item) {
-                                return $item->value;
-                            }));
+                ->map(function ($item) {
+                    return $item->value;
+                }));
         } else {
             $model->setRelation('meta', collect());
         }
 
         if (method_exists($model, 'getMetables') && is_iterable($metables = $this->getMetables())) {
             foreach ($metables as $metable) {
-                if (!$model->meta->has($metable)) {
+                if (! $model->meta->has($metable)) {
                     $model->meta->put($metable, '');
                 }
             }
@@ -61,27 +59,24 @@ class BaseRepository implements BaseInterface {
             $callback($model);
         }
 
-
         return $model;
     }
 
     private function resolveWith($with = []) {
-        if (is_array($with) && !empty($with)) {
+        if (is_array($with) && ! empty($with)) {
             foreach ($with as $key => $item) {
-                if (!Str::startsWith($key, '_meta:')) {
+                if (! Str::startsWith($key, '_meta:')) {
                     continue;
                 }
 
                 $list = explode(',', str_teplace($key, '_meta:', ''));
-                
-                $with['meta'] = function($query) use ($list) {
+
+                $with['meta'] = function ($query) use ($list) {
                     $query->whereIn('key', $list);
                 };
 
-
                 unset($with[$key]);
                 break;
-                
             }
         }
 
@@ -116,7 +111,7 @@ class BaseRepository implements BaseInterface {
             foreach ($row as $key => $value) {
                 $query = "$key='$value'";
             }
-            $builder->{$where}('(' . implode(' AND ', $query) . ')');
+            $builder->{$where}('('.implode(' AND ', $query).')');
         }
 
         return $builder->get();
@@ -127,7 +122,7 @@ class BaseRepository implements BaseInterface {
         $name = (new ReflectionClass($this->model))->getShortName();
         $namespace = $reflection->getNamespaceName();
         $baseNamespace = substr($namespace, 0, strpos($namespace, '\\Database'));
-        $classFilter = "$baseNamespace\\Builders\\Filters\\" . $name . "Filter";
+        $classFilter = "$baseNamespace\\Builders\\Filters\\".$name.'Filter';
 
         if (class_exists($classFilter)) {
             $filter = new $classFilter($request, $this->model);
@@ -146,7 +141,7 @@ class BaseRepository implements BaseInterface {
 
         return $this->get();
     }
-    
+
     public function dataFilter($request, $paginate = false) {
         return $this->filter($request, $paginate);
     }
@@ -157,18 +152,18 @@ class BaseRepository implements BaseInterface {
             'items' => $this->filter($request, true),
             'model' => $model,
             'plural' => Str::plural($model),
-            'singular' => Str::singular($model)
-                ] + $data;
-
+            'singular' => Str::singular($model),
+        ] + $data;
 
         return $viewData;
     }
 
     public function crudList($view, $request, $data = []) {
         $viewData = $this->crudFilter($request, $data);
+
         return [
-            'view' => view($view, $viewData)->render()
-                ] + $viewData;
+            'view' => view($view, $viewData)->render(),
+        ] + $viewData;
     }
 
     public function getPage($request, $data = []) {
@@ -178,17 +173,17 @@ class BaseRepository implements BaseInterface {
         $viewData = [
             $plural => $this->filter($request, true),
             $singular => $model,
-                ] + $data;
-
+        ] + $data;
 
         return $viewData;
     }
 
     public function search($view, $request, $data = []) {
         $viewData = $this->getPage($request, $data);
+
         return [
-            'view' => view($view, $viewData)->render()
-                ] + $viewData;
+            'view' => view($view, $viewData)->render(),
+        ] + $viewData;
     }
 
     public function weeks($weeks = 1) {
@@ -206,5 +201,4 @@ class BaseRepository implements BaseInterface {
     public function seconds($seconds = 60) {
         return $this;
     }
-
 }

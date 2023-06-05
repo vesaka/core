@@ -10,12 +10,9 @@ use Illuminate\Support\ServiceProvider;
  * @author vesak
  */
 class TranslationServiceProvider extends ServiceProvider {
-    
     public function register(): void {
-        
     }
-    
+
     public function boot() {
-        
     }
 }

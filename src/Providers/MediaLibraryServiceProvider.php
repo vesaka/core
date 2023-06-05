@@ -10,14 +10,12 @@ use Illuminate\Support\ServiceProvider;
  * @author vesak
  */
 class MediaLibraryServiceProvider extends ServiceProvider {
-   
     public function boot() {
-        if (!defined('FEATURED_IMAGE')) {
+        if (! defined('FEATURED_IMAGE')) {
             define('FEATURED_IMAGE', 'featured_image');
         }
     }
-    
+
     public function register() {
-        
     }
 }

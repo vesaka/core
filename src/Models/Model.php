@@ -3,15 +3,12 @@
 namespace Vesaka\Core\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Vesaka\Admin\Model\User;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
-use Vesaka\Core\Models\Category;
-use Vesaka\Core\Models\Meta;
 use Illuminate\Http\Request;
-
-use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Vesaka\Admin\Model\User;
 use Vesaka\Core\Traits\Models\CropperFeaturedImageTrait;
+use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
 use Vesaka\Core\Traits\Models\HasMetaTrait;
 
 /**
@@ -20,17 +17,21 @@ use Vesaka\Core\Traits\Models\HasMetaTrait;
  * @author vesak
  */
 class Model extends CoreModel {
-
-    use SoftDeletes, CropperFeaturedImageTrait, HasMetaTrait;
+    use SoftDeletes;
+    use CropperFeaturedImageTrait;
+    use HasMetaTrait;
 
     protected $table = 'models';
+
     protected $fillable = ['author_id', 'title', 'content', 'type', 'status', 'name', 'parent'];
+
     protected $__locales;
+
     protected $attributes = [
         'type' => 'model',
-        'status' => 'pending'
+        'status' => 'pending',
     ];
-    
+
     protected $metables = ['tags'];
 
     public function author() {
@@ -39,23 +40,24 @@ class Model extends CoreModel {
 
     public function categories() {
         return $this->morphToMany(Category::class, 'relation', 'relations', 'relation_id', 'model_id')
-                        ->where('relation_type', get_called_class());
+            ->where('relation_type', get_called_class());
     }
 
     public function syncCategories(array $ids = []) {
         $this->categories()->syncWithPivotValues($ids, [
-                    'model_type' => Category::class,
-                    'name' => 'post-category',
-                    'order' => 1
+            'model_type' => Category::class,
+            'name' => 'post-category',
+            'order' => 1,
         ]);
-        
+
         return $this;
     }
-    public final function getType(): string {
+
+    final public function getType(): string {
         if (isset($this->__type)) {
             return $this->__type;
         }
-        
+
         return Str::of((new \ReflectionClass(get_called_class()))->getShortName())->slug();
     }
 
@@ -64,13 +66,13 @@ class Model extends CoreModel {
     }
 
     public function setNameAttribute($value) {
-        if (!empty($value) || null === $value) {
+        if (! empty($value) || null === $value) {
             $this->attributes['name'] = Str::slug($this->title);
         }
     }
 
     public function setAuthorIdAttribute($value) {
-        if (!empty($value) || null === $value) {
+        if (! empty($value) || null === $value) {
             $this->attributes['author_id'] = auth()->id() ?? 1;
         }
     }
@@ -84,8 +86,8 @@ class Model extends CoreModel {
     }
 
     public function getLocalesAttribute() {
-        if (!isset($this->__locales)) {
-            $this->__locales = Arr::dot(trans('cms::documents.' . $this->type) ?? []);
+        if (! isset($this->__locales)) {
+            $this->__locales = Arr::dot(trans('cms::documents.'.$this->type) ?? []);
         }
 
         return $this->__locales;
@@ -103,7 +105,6 @@ class Model extends CoreModel {
         $data = [];
 
         if ($this->relationLoaded('media')) {
-
             $filepath = $this->getFirstMediaUrl(MEDIA_GROUP_GALLERY, MEDIA_CONVERSION_ORIGINAL);
             $image = \Storage::disk('public')->path(Str::of($filepath)->replace(url('storage/'), ''));
             if (file_exists($image) && is_file($image)) {
@@ -112,47 +113,45 @@ class Model extends CoreModel {
                     'src' => Str::replace('/storage/', '/src/', $filepath),
                     'width' => $info[0],
                     'height' => $info[1],
-                    'ratio' => round($info[0] / $info[1], 2)
+                    'ratio' => round($info[0] / $info[1], 2),
                 ];
             }
         }
 
         return (object) array_merge([
-                    'src' => '',
-                    'width' => 0,
-                    'height' => 0,
-                    'ratio' => 1
-                        ], $data);
+            'src' => '',
+            'width' => 0,
+            'height' => 0,
+            'ratio' => 1,
+        ], $data);
     }
-    
+
     public function getPreviewAttribute() {
         return $this->getFirstMediaUrl(FEATURED_IMAGE, 'medium');
     }
-    
+
     public function tags() {
         return $this->hasMany(Meta::class, 'model_id', 'id')->where([
             'type' => get_called_class(),
-            'name' => 'tags'
+            'name' => 'tags',
         ]);
     }
-    
+
     public function setFeaturedImage(Request $request) {
         $action = 0 < intval($request->id) ? 'update' : 'create';
         $handler = '';
         $traits = class_uses_recursive(get_class($this));
         if (in_array(FilepondFeaturedImageTrait::class, $traits)) {
             $handler = 'Filepond';
-        } else if(in_array(CropperFeaturedImageTrait::class, $traits)) {
+        } elseif (in_array(CropperFeaturedImageTrait::class, $traits)) {
             $handler = 'Cropper';
         }
-        
+
         $method = "{$action}From{$handler}";
         if (method_exists($this, $method)) {
             $this->{$method}($request);
         }
-        
+
         return $this;
     }
-    
-
 }

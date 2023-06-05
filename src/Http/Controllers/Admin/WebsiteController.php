@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
  */
 class WebsiteController extends ModelController {
     protected string $type = 'website';
+
     public function datatable(Request $request) {
         return app('website')->datatable($request);
     }

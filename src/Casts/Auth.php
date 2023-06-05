@@ -3,8 +3,8 @@
 namespace Vesaka\Core\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use App\Model\User;
 use Illuminate\Contracts\Encryption\DecryptException;
+
 /**
  * Description of Auth
  *
@@ -17,9 +17,10 @@ class Auth implements CastsAttributes {
         if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
             return forward_static_call_array([$provider, 'firstOrNew'], [[
                 'id' => null,
-                'email' => $value]
+                'email' => $value],
             ]);
         }
+
         return forward_static_call_array([$provider, 'find'], [$value]);
     }
 
@@ -33,15 +34,14 @@ class Auth implements CastsAttributes {
         if ($__value instanceof $provider) {
             return $__value->id ?? $value->email;
         }
-        
+
         return $__value;
     }
-    
+
     private function provider() {
         $guard = config('auth.defaults.guard');
         $provider = config("auth.guards.$guard.provider");
-        
+
         return config("auth.providers.$provider.model");
     }
-
 }

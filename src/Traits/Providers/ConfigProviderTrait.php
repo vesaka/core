@@ -1,16 +1,15 @@
 <?php
 
 namespace Vesaka\Core\Traits\Providers;
+
 use Illuminate\Support\Arr;
 
 /**
- *
  * @author vesak
  */
 trait ConfigProviderTrait {
-    
     protected function configs() {
-        $files = glob($this->__dir__ . "config" . DIRECTORY_SEPARATOR . "*.php");
+        $files = glob($this->__dir__.'config'.DIRECTORY_SEPARATOR.'*.php');
         foreach ($files as $file) {
             $key = str_replace('.php', '', basename($file));
             $merging = require_once $file;
@@ -21,16 +20,16 @@ trait ConfigProviderTrait {
             }
         }
     }
-    
+
     protected function mergeConfigs(array $original, array $merging): array {
         $array = array_merge($original, $merging);
 
         foreach ($original as $key => $value) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 continue;
             }
 
-            if (!Arr::exists($merging, $key)) {
+            if (! Arr::exists($merging, $key)) {
                 continue;
             }
 

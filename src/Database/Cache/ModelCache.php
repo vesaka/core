@@ -2,13 +2,13 @@
 
 namespace Vesaka\Core\Database\Cache;
 
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Vesaka\Core\Abstracts\BaseCache;
 use Vesaka\Core\Database\Interfaces\ModelInterface;
 use Vesaka\Core\Http\Requests\Model\SaveDocumentRequest;
 use Vesaka\Core\Models\Model;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * Description of ModelCache
@@ -16,14 +16,15 @@ use Illuminate\Contracts\Pagination\Paginator;
  * @author Vesaka
  */
 class ModelCache extends BaseCache implements ModelInterface {
-
     public function getDocuments() {
         return $this->raw();
+
         return $this->fetch('privacy-policy', 'terms-and-conditions');
     }
 
     public function document(string $type): Model {
         return $this->raw();
+
         return $this->fetch($type);
     }
 
@@ -41,16 +42,15 @@ class ModelCache extends BaseCache implements ModelInterface {
 
     public function onSave(Model $model, Request $request) {
         return $this->tags("$model->type.$model->id", $model->type)
-                        ->forget()
-                        ->refresh();
+            ->forget()
+            ->refresh();
     }
 
     public function mostRecent(string $category = '', int $limit = 10): Collection {
         return $this->tags($this->model->getType(), 'recent', $category)->fetch();
     }
-    
-    public function collectByType(string $type  = '', $limit = 100): Collection {
+
+    public function collectByType(string $type = '', $limit = 100): Collection {
         return $this->tags($type ?? $this->model->getType(), 'list', $limit)->fetch();
     }
-
 }

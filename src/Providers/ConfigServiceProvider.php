@@ -10,9 +10,8 @@ use Illuminate\Support\Arr;
  * @author vesak
  */
 class ConfigServiceProvider extends BaseServiceProvider {
-    
     public function register(): void {
-        $files = glob($this->__dir__ . "config" . DIRECTORY_SEPARATOR . "*.php");
+        $files = glob($this->__dir__.'config'.DIRECTORY_SEPARATOR.'*.php');
         foreach ($files as $file) {
             $key = str_replace('.php', '', basename($file));
             $merging = require_once $file;
@@ -23,20 +22,19 @@ class ConfigServiceProvider extends BaseServiceProvider {
             }
         }
     }
-    
+
     public function boot() {
-        
     }
-    
+
     protected function mergeConfigs(array $original, array $merging) {
         $array = array_merge($original, $merging);
 
         foreach ($original as $key => $value) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 continue;
             }
 
-            if (!Arr::exists($merging, $key)) {
+            if (! Arr::exists($merging, $key)) {
                 continue;
             }
 

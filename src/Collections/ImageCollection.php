@@ -1,4 +1,5 @@
 <?php
+
 namespace Vesaka\Core\Collections;
 
 /**
@@ -7,7 +8,4 @@ namespace Vesaka\Core\Collections;
  * @author Vesaka
  */
 class ImageCollection extends ModelCollection {
-
 }
-
-

@@ -2,13 +2,12 @@
 
 namespace Vesaka\Core\Abstracts;
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
-use ReflectionClass;
-use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 /**
  * Description of AbstractCacheDecorator
@@ -16,20 +15,23 @@ use Illuminate\Contracts\Cache\Repository;
  * @author User
  */
 class BaseCache implements BaseInterface {
-
     protected $repository;
+
     protected $cache;
+
     protected $minutes = 1;
+
     protected $seconds = 60;
+
     protected string $name;
+
     protected $tags = [];
+
     protected string $plural;
 
     /**
-     * 
-     * @param AbstractRepository $repository
-     * @param Cache $cache
-     * 
+     * @param  AbstractRepository  $repository
+     * @param  Cache  $cache
      */
     public function __construct(BaseRepository $repository, Repository $cache) {
         $this->repository = $repository;
@@ -50,28 +52,30 @@ class BaseCache implements BaseInterface {
     public function observe($class) {
         return $this->repository->getModel()->observe($class);
     }
-    
+
     public function filter($request, $paginate = false) {
         //return $this->raw();
-        return $this->tags($this->name. '.page.'. $request->page, (int) $paginate)
-                ->fetch($this->name . '.page.'. $request->page);
+        return $this->tags($this->name.'.page.'.$request->page, (int) $paginate)
+            ->fetch($this->name.'.page.'.$request->page);
     }
 
     public function all() {
-        return $this->tags($this->name)->fetch('all-' . $this->plural);
+        return $this->tags($this->name)->fetch('all-'.$this->plural);
     }
 
     public function find($key) {
-        return $this->raw(); 
+        return $this->raw();
+
         return $this->tags([$this->name, "$this->name.$key"])->fetch($key);
     }
-    
+
     public function findWith($key, $with = []) {
-        return $this->raw(); 
-        if (!is_array($with)) {
+        return $this->raw();
+        if (! is_array($with)) {
             $with = [$with];
         }
         $keys = Arr::isAssoc($with) ? array_keys($with) : $with;
+
         return $this->tags(array_merge([$this->name, "$this->name.$key"], $keys))->fetch();
     }
 
@@ -79,15 +83,16 @@ class BaseCache implements BaseInterface {
         $model = $this->repository->create($data);
         $this->creating($model);
         $this->tagResult($this->cache
-                ->tags([$this->name, "$this->name.$model->id"])
-                ->put($model->id, $model, $this->seconds));
+            ->tags([$this->name, "$this->name.$model->id"])
+            ->put($model->id, $model, $this->seconds));
         $this->forget('all');
         $this->created($model);
+
         return $model;
     }
 
     public function update($model, $data) {
-        if (!is_object($model)) {
+        if (! is_object($model)) {
             $model = $this->find($model);
         }
 
@@ -99,7 +104,7 @@ class BaseCache implements BaseInterface {
     }
 
     public function delete($model) {
-        if (!is_object($model)) {
+        if (! is_object($model)) {
             $key = $model;
             $model = $this->repository->destroy($model);
         } else {
@@ -118,24 +123,24 @@ class BaseCache implements BaseInterface {
     }
 
     public function forget($key = null) {
-        if (!$key) {
+        if (! $key) {
             $key = implode('.', $this->tags);
         }
         $this->cache->tags($this->tags)->forget($key);
+
         return $this;
     }
 
     public function fetch($key = null) {
         $log = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
-        
-        if (!$key) {
+
+        if (! $key) {
             $key = implode('.', $this->tags);
         }
 
-        
-        return $this->cache->tags($this->tags)->remember($key, $this->seconds, function() use ($log) {
-                    return call_user_func_array([$this->repository, $log[1]['function']], $log[1]['args']);
-                });
+        return $this->cache->tags($this->tags)->remember($key, $this->seconds, function () use ($log) {
+            return call_user_func_array([$this->repository, $log[1]['function']], $log[1]['args']);
+        });
     }
 
     public function refresh() {
@@ -153,9 +158,10 @@ class BaseCache implements BaseInterface {
     }
 
     public function remember($key, $closure, $seconds = null) {
-        if (!$key) {
+        if (! $key) {
             $key = implode('.', $this->tags);
         }
+
         return $this->cache->tags($this->tags)->remember($key, $seconds ?? $this->seconds, $closure);
     }
 
@@ -165,12 +171,14 @@ class BaseCache implements BaseInterface {
 
     public function flush() {
         $this->cache->tags($this->tags)->flush();
+
         return $this;
     }
 
     public function tags($tags = null) {
         if (null === $tags) {
             $this->tags = [$this->name];
+
             return $this;
         }
 
@@ -186,8 +194,7 @@ class BaseCache implements BaseInterface {
     }
 
     public function tag($data) {
-        if (!$data instanceof Collection) {
-
+        if (! $data instanceof Collection) {
             $data = collect($data);
 
             $data->each(function ($model) {
@@ -198,16 +205,19 @@ class BaseCache implements BaseInterface {
 
     public function weeks($weeks = 1) {
         $this->seconds = 60 * 60 * 60 * 7 * $weeks;
+
         return $this;
     }
 
     public function days($days = 1) {
         $this->seconds = 60 * 60 * 60 * $days;
+
         return $this;
     }
 
     public function hours($hours = 1) {
         $this->seconds = 60 * 60 * $hours;
+
         return $this;
     }
 
@@ -234,6 +244,7 @@ class BaseCache implements BaseInterface {
 
     protected function created($model) {
         $this->afterChange($model);
+
         return $this;
     }
 
@@ -243,6 +254,7 @@ class BaseCache implements BaseInterface {
 
     protected function updated($model) {
         $this->afterChange($model);
+
         return $this;
     }
 
@@ -252,6 +264,7 @@ class BaseCache implements BaseInterface {
 
     protected function deleted($model) {
         $this->afterChange($model);
+
         return $this;
     }
 
@@ -266,34 +279,33 @@ class BaseCache implements BaseInterface {
     public function tagResult($result) {
         if ($result instanceof Collection) {
             $this->tagCollection($result);
-        } else if ($result instanceof Model) {
+        } elseif ($result instanceof Model) {
             $this->tagModel($result);
         }
-        
+
         return $result;
     }
 
     public function tagCollection(Collection $collection) {
         $model = $collection->first();
-        if(!$model) {
+        if (! $model) {
             return;
         }
-        
+
         $plural = $this->tags(Str::plural($model->getTable()));
         foreach ($collection as $row) {
             if ($row instanceof Model) {
                 $this->tagModel($row);
             }
         }
-        
+
         return $this;
     }
-    
-    
+
     public function tagModel(Model $model) {
         $name = Str::singular($model->getTable());
         $items = $model->getRelations();
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $this->tagResult($item);
         }
         $this->tags("$name.$model->id");

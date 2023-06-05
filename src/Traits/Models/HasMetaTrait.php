@@ -3,8 +3,8 @@
 namespace Vesaka\Core\Traits\Models;
 
 use Illuminate\Http\Request;
+
 /**
- *
  * @author vesak
  */
 trait HasMetaTrait {
@@ -33,7 +33,7 @@ trait HasMetaTrait {
                 if ($data->has($name) && in_array($name, $metables)) {
                     $deletables[] = $name;
                 }
-                
+
                 if (in_array($name, $this->metables)) {
                     $value = explode(',', $value);
                 }
@@ -44,7 +44,7 @@ trait HasMetaTrait {
                             'model_id' => $this->id,
                             'name' => $name,
                             'value' => $item ?? '',
-                            'type' => $class
+                            'type' => $class,
                         ];
                     }
                 } else {
@@ -52,15 +52,16 @@ trait HasMetaTrait {
                         'model_id' => $this->id,
                         'name' => $name,
                         'value' => $value ?? '',
-                        'type' => $class
+                        'type' => $class,
                     ];
                 }
             }
 
             $this->meta()->whereIn('name', $deletables)
-                    ->where('type', $class)
-                    ->forceDelete();
+                ->where('type', $class)
+                ->forceDelete();
             $this->meta()->insert($newMeta);
+
             return $this;
         }
     }

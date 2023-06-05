@@ -6,6 +6,6 @@ return [
         'website',
         'skill',
         'experience',
-        'post'
-    ]
+        'post',
+    ],
 ];

@@ -5,7 +5,6 @@ namespace Vesaka\Core\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use ReflectionClass;
-use ReflectionMethod;
 
 /**
  * Description of MacroServiceProvider
@@ -13,14 +12,14 @@ use ReflectionMethod;
  * @author vesak
  */
 class MacroStrServiceProvider extends ServiceProvider {
-
     public function register(): void {
         Str::macro('dotKebab', function ($value) {
             if (is_object($value)) {
                 $value = (new ReflectionObject($value))->getName();
-            } else if (class_exists($value)) {
+            } elseif (class_exists($value)) {
                 $value = (new ReflectionClass($value))->getName();
             }
+
             return collect(explode('\\', $value))->map(function ($segment) {
                 return Str::kebab($segment);
             })->implode('.');
@@ -36,11 +35,9 @@ class MacroStrServiceProvider extends ServiceProvider {
             return preg_replace_callback($pattern, function ($matches) use ($data) {
                 return @$data[$matches[1]] ?: $matches[0];
             }, $format);
-                });
-            }
-
-    public function boot() {
-        
+        });
     }
 
+    public function boot() {
+    }
 }

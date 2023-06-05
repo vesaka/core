@@ -8,5 +8,4 @@ namespace Vesaka\Core\Http\Controllers\Admin;
  * @author vesak
  */
 class CategoryController extends ModelController {
-    
 }

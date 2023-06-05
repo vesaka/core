@@ -6,7 +6,7 @@ return [
             'label' => 'Dashboard',
             'name' => 'admin::dashboard',
             'route' => 'admin::dashboard',
-            'icon' => ''
+            'icon' => '',
         ],
         [
             'label' => 'Images',
@@ -25,7 +25,7 @@ return [
                     'icon' => 'add',
                     'route' => 'admin::image.index',
                 ],
-            ]
+            ],
         ],
         [
             'label' => 'Websites',
@@ -44,7 +44,7 @@ return [
                     'icon' => 'add',
                     'route' => 'admin::website.index',
                 ],
-            ]
+            ],
         ],
         [
             'label' => 'Skills',
@@ -63,8 +63,7 @@ return [
                     'icon' => 'add',
                     'route' => 'admin::skill.index',
                 ],
-            ]
-        ]
-    ]
+            ],
+        ],
+    ],
 ];
-

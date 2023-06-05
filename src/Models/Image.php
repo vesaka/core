@@ -8,9 +8,8 @@ namespace Vesaka\Core\Models;
  * @author vesak
  */
 class Image extends Model {
-    
-//    public function categories() {
-//        return $this->morphToMany(Category::class, 'relation', 'relations', 'relation_id', 'model_id')
-//                        ->where('relation_type', self::class);
-//    }
+    //    public function categories() {
+    //        return $this->morphToMany(Category::class, 'relation', 'relations', 'relation_id', 'model_id')
+    //                        ->where('relation_type', self::class);
+    //    }
 }

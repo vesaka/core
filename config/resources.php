@@ -1,6 +1,7 @@
 <?php
+
 use Vesaka\Core\Resources;
 
 return [
-    'img' => Resources\ImageResource::class
+    'img' => Resources\ImageResource::class,
 ];

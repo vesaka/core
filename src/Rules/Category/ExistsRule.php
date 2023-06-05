@@ -1,4 +1,5 @@
 <?php
+
 namespace Vesaka\Core\Rules\Category;
 
 use Illuminate\Contracts\Validation\Rule;
@@ -18,10 +19,10 @@ class ExistsRule implements Rule {
         if (request('category')) {
             return true;
         }
-        return !app('category')->where([
+
+        return ! app('category')->where([
             'parent_id' => request('parent_id') ?? null,
-            'name' => $value
+            'name' => $value,
         ])->exists();
     }
-
 }

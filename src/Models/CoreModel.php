@@ -5,10 +5,9 @@ namespace Vesaka\Core\Models;
 use Illuminate\Database\Eloquent\Model as AppModel;
 //use Vesaka\Core\Traits\UserTimezoneAware;
 //use Vesaka\Core\Traits\HasCollectionTrait;
-use Vesaka\Core\Models\Meta;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Vesaka\Core\Traits\HasCollectionTrait;
 
@@ -18,12 +17,13 @@ use Vesaka\Core\Traits\HasCollectionTrait;
  * @author Vesaka
  */
 class CoreModel extends AppModel implements HasMedia {
-
-    use InteractsWithMedia,
-        HasCollectionTrait;
+    use InteractsWithMedia;
+    use HasCollectionTrait;
 
     public $timestamps = true;
+
     protected $__meta = null;
+
     protected $metables = [];
 
     public function meta() {
@@ -35,7 +35,7 @@ class CoreModel extends AppModel implements HasMedia {
     }
 
     public function field($name) {
-        if (!$this->__meta) {
+        if (! $this->__meta) {
             $this->__meta = $this->meta->keyBy('key');
         }
 
@@ -57,19 +57,16 @@ class CoreModel extends AppModel implements HasMedia {
         $crop = array_merge($options['crop'], request('crop', []));
         foreach ($options['conversions'] as $name => $conversion) {
             $this->addMediaConversion($name)
-                    ->manualCrop($crop['width'], $crop['height'], $crop['x'], $crop['y'])
-                    ->fit(Manipulations::FIT_CROP, $conversion['width'], $conversion['height'])
-                    ->keepOriginalImageFormat()
-                    ->nonQueued();
+                ->manualCrop($crop['width'], $crop['height'], $crop['x'], $crop['y'])
+                ->fit(Manipulations::FIT_CROP, $conversion['width'], $conversion['height'])
+                ->keepOriginalImageFormat()
+                ->nonQueued();
 
-            $this->addMediaConversion($name . '-webp')
-                    ->format(Manipulations::FORMAT_WEBP)
-                    ->manualCrop($crop['width'], $crop['height'], $crop['x'], $crop['y'])
-                    ->fit(Manipulations::FIT_CROP, $conversion['width'], $conversion['height'])
-                    ->nonQueued();
+            $this->addMediaConversion($name.'-webp')
+                ->format(Manipulations::FORMAT_WEBP)
+                ->manualCrop($crop['width'], $crop['height'], $crop['x'], $crop['y'])
+                ->fit(Manipulations::FIT_CROP, $conversion['width'], $conversion['height'])
+                ->nonQueued();
         }
     }
-    
-
-
 }

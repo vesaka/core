@@ -2,11 +2,9 @@
 
 namespace Vesaka\Core\Observers;
 
+use File;
 use Vesaka\Core\Abstracts\BaseObserver;
 use Vesaka\Core\Models\Model;
-use File;
-use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
 
 /**
  * Description of ModelObserver
@@ -14,13 +12,13 @@ use Illuminate\Http\UploadedFile;
  * @author Vesaka
  */
 class ModelObserver extends BaseObserver {
+    public const GROUP = 'gallery';
 
-    const GROUP = 'gallery';
-    const WEBP_GROUP = 'webp_gallery';
+    public const WEBP_GROUP = 'webp_gallery';
+
     protected $countable_meta = ['tags'];
-    
+
     public function saved(Model $model) {
-        
         if (0 < intval(request('id'))) {
             $this->onUpdated($model);
         } else {
@@ -32,7 +30,7 @@ class ModelObserver extends BaseObserver {
         $request = request();
         $crop = $request->crop ?? [];
         $media = $model->getFirstMedia(FEATURED_IMAGE);
-        
+
         $cropChanged = false;
         if ($media) {
             $cropData = $media->getCustomProperty('crop');
@@ -40,7 +38,7 @@ class ModelObserver extends BaseObserver {
                 if (isset($cropData[$key])) {
                     if (intval($cropData[$key]) === intval($value)) {
                         $cropChanged = true;
-                    break;
+                        break;
                     }
                 } else {
                     $cropChanged = true;
@@ -48,23 +46,21 @@ class ModelObserver extends BaseObserver {
                 }
             }
         }
-        
-        
+
         $newFile = null;
         if ($request->hasFile('file')) {
             $newFile = $request->file('file');
-            
-        } else if ($cropChanged) {
+        } elseif ($cropChanged) {
             $oldFile = $media->getPath();
-            $newFile = storage_path('media-library/temp/' . basename($oldFile));
+            $newFile = storage_path('media-library/temp/'.basename($oldFile));
             File::copy($oldFile, $newFile);
         }
 
         if ($newFile) {
             $model->clearMediaCollection(FEATURED_IMAGE);
             $model->addMedia($newFile)
-                    ->withCustomProperties(['crop' => $crop])
-                    ->toMediaCollection(FEATURED_IMAGE);
+                ->withCustomProperties(['crop' => $crop])
+                ->toMediaCollection(FEATURED_IMAGE);
             if (file_exists($newFile)) {
                 File::delete($newFile);
             }
@@ -72,19 +68,17 @@ class ModelObserver extends BaseObserver {
 
         $model->syncCategories($request->category ?? []);
         $this->storeMeta($model, $request->meta ?? []);
-
-
     }
-    
+
     public function onCreated(Model $model) {
         $request = request();
 
         $model->syncCategories($request->category ?? []);
         $this->storeMeta($model, $request->meta ?? []);
-        
+
         $model->addMedia($request->file('file'))
-                    ->withCustomProperties(['crop' => $request->crop])
-                    ->toMediaCollection(FEATURED_IMAGE);
+            ->withCustomProperties(['crop' => $request->crop])
+            ->toMediaCollection(FEATURED_IMAGE);
     }
 
     public function deleting(Model $model) {
@@ -122,7 +116,7 @@ class ModelObserver extends BaseObserver {
                 if ($data->has($name) && in_array($name, $metables)) {
                     $deletables[] = $name;
                 }
-                
+
                 if (in_array($name, $this->countable_meta)) {
                     $value = explode(',', $value);
                 }
@@ -133,7 +127,7 @@ class ModelObserver extends BaseObserver {
                             'model_id' => $model->id,
                             'name' => $name,
                             'value' => $item ?? '',
-                            'type' => $class
+                            'type' => $class,
                         ];
                     }
                 } else {
@@ -141,16 +135,15 @@ class ModelObserver extends BaseObserver {
                         'model_id' => $model->id,
                         'name' => $name,
                         'value' => $value ?? '',
-                        'type' => $class
+                        'type' => $class,
                     ];
                 }
             }
 
             $model->meta()->whereIn('name', $deletables)
-                    ->where('type', $class)
-                    ->forceDelete();
+                ->where('type', $class)
+                ->forceDelete();
             $model->meta()->insert($newMeta);
         }
     }
-
 }

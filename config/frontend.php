@@ -7,17 +7,17 @@ return [
         'versions' => [
             'desktop' => [
                 'size' => 300,
-                'quality' => 100
+                'quality' => 100,
             ],
             'mobile' => [
                 'size' => 150,
-                'quality' => 65
+                'quality' => 65,
             ],
             'tablet' => [
                 'size' => 200,
-                'quality' => 75
-            ]
-        ]
+                'quality' => 75,
+            ],
+        ],
     ],
     'gallery' => [
         'default' => '/src/game/game-6.jpg',
@@ -29,7 +29,7 @@ return [
             'height' => 480,
             'rotate' => 0,
             'scaleX' => 1,
-            'scaleY' => 1
+            'scaleY' => 1,
         ],
         'conversions' => [
             'small' => [
@@ -38,23 +38,23 @@ return [
             ],
             'medium' => [
                 'width' => 640,
-                'height' => 480
+                'height' => 480,
             ],
             'big' => [
                 'width' => 1280,
-                'height' => 720
+                'height' => 720,
             ],
             'thumbnail' => [
                 'width' => 72,
                 'height' => 72,
-            ]
+            ],
         ],
     ],
     'pusher_key' => env('PUSHER_KEY'),
     'pusher' => [
         'key' => env('PUSHER_APP_KEY'),
         'cluster' => env('PUSHER_APP_CLUSTER'),
-        'forceTLS' => env('PUSHER_FORCE_TLS')
+        'forceTLS' => env('PUSHER_FORCE_TLS'),
     ],
     'locale' => app()->getLocale(),
 ];

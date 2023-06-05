@@ -1,10 +1,11 @@
 <?php
+
 namespace Vesaka\Core\Database\Repositories;
 
+use Illuminate\Support\Str;
 use Vesaka\Core\Abstracts\BaseRepository;
 use Vesaka\Core\Database\Interfaces\CategoryInterface;
 use Vesaka\Core\Http\Requests\Category\StoreCategoryRequest;
-use Illuminate\Support\Str;
 
 /**
  * Description of CategoryRepository
@@ -12,26 +13,24 @@ use Illuminate\Support\Str;
  * @author vesak
  */
 class CategoryRepository extends BaseRepository implements CategoryInterface {
-    
     public function nested($parent = null) {
         $items = $this->model
-                ->from('categories as c')
-                ->with('children', 'meta', 'path')
-                ->orderBy('c.priority')
-                ;
+            ->from('categories as c')
+            ->with('children', 'meta', 'path')
+            ->orderBy('c.priority');
         if (ctype_digit($parent) || is_int($parent)) {
             $items->where('c.parent_id', $parent);
-        } else if(is_string($parent)) {
+        } elseif (is_string($parent)) {
             $items->select('c.*')
-                    ->join('categories as p', 'p.id', '=', 'c.parent_id')
-                    ->where('p.slug', $parent);
+                ->join('categories as p', 'p.id', '=', 'c.parent_id')
+                ->where('p.slug', $parent);
         } else {
             $items->whereNull('c.parent_id');
         }
 
         return $items->get()->treeView();
     }
-    
+
     public function store(StoreCategoryRequest $request) {
         if ($request->category) {
             $category = $this->model->find($request->category);
@@ -44,9 +43,8 @@ class CategoryRepository extends BaseRepository implements CategoryInterface {
             $this->model->create([
                 'parent_id' => $request->parent_id,
                 'name' => $request->name,
-                'slug' => Str::slug($request->name)
+                'slug' => Str::slug($request->name),
             ]);
         }
-        
     }
 }

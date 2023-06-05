@@ -12,13 +12,11 @@ use Illuminate\Support\Str;
  */
 class ToPast implements CastsAttributes {
     private static $irregulars = [
-        'send' => 'sent'
+        'send' => 'sent',
     ];
-    
-    
+
     public function get($model, string $key, $value, array $attributes) {
-        
-        if (empty($value) && ($verb = get_class($model) . '::DEFAULT_' .Str::upper($key))) {
+        if (empty($value) && ($verb = get_class($model).'::DEFAULT_'.Str::upper($key))) {
             return constant($verb);
         }
 
@@ -26,27 +24,26 @@ class ToPast implements CastsAttributes {
     }
 
     public function set($model, string $key, $value, array $attributes) {
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return '';
         }
-        
-        if (defined($verb = get_class($model) . '::' . Str::upper($value) )) {
+
+        if (defined($verb = get_class($model).'::'.Str::upper($value))) {
             return constant($verb);
         }
-        
+
         if (isset(self::$irregulars[$value])) {
             return self::$irregulars[$value];
         }
-        
+
         if (Str::endsWith($value, 'ed')) {
             return $value;
         }
-        
+
         if (Str::endsWith($value, 'e')) {
-            return $value . 'd';
+            return $value.'d';
         }
 
-        return $value . 'ed';
+        return $value.'ed';
     }
-
 }

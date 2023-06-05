@@ -8,7 +8,5 @@ namespace Vesaka\Core\Providers;
  * @author vesak
  */
 class AdminRoutesServiceProvider extends RoutesServiceProvider {
-    
     protected string $alias = 'admin';
-    
 }

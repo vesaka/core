@@ -1,4 +1,5 @@
 <?php
+
 namespace Vesaka\Core\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
@@ -17,5 +18,4 @@ class Json implements CastsAttributes {
     public function set($model, string $key, $value, array $attributes) {
         return json_encode($value);
     }
-
 }
