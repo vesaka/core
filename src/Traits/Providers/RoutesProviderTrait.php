@@ -35,4 +35,22 @@ trait RoutesProviderTrait {
             }
         }
     }
+
+    protected function registerNormalRoutes(...$files) {
+
+        foreach ($files as $file) {
+            if (!is_string($file)) {
+                continue;
+            }
+
+            $filename = $this->__dir__.'routes/'.$file.'.php';
+            if (file_exists($filename)) {
+                Route::middleware(['web'])
+                    ->name($this->title.'::')
+                    ->namespace($this->namespace.'Http\\Controllers')
+                    ->group($filename);
+            }
+        }
+        
+    }
 }
