@@ -11,6 +11,8 @@ use Illuminate\Foundation\Http\FormRequest;
  * @author Vesaka
  */
 class ApiRequest extends FormRequest {
+
+    protected string $messagesParser = 'default';
     protected $rules;
 
     protected $messages = [];
@@ -22,6 +24,16 @@ class ApiRequest extends FormRequest {
     }
 
     public function messages() {
+        $parser = $this->messagesParser;
+
+        if (method_exists($this, $parser)) {
+            return $this->{$parser}();
+        }
+
+        return parent::messages();
+    }
+
+    protected function default(): array {
         $messages = [];
         $rules = $this->rules();
         foreach ($rules as $key => $rule) {
@@ -39,11 +51,11 @@ class ApiRequest extends FormRequest {
                 if ($item instanceof Rule) {
                     $classname = get_class($item);
                     $class = substr($classname, strrpos($classname, '\\') + 1);
-                    $messages[$key.'.'.$class . $suffix]['rule'] = $item->message();
+                    $messages[$key.'.'.$class . $suffix] = $item->message();
                 } else {
                     $name = explode(':', $item, 2);
                     $messageKey = $key . '.' . $name[0] . $suffix;
-                    $messages[$messageKey]['rule'] = $name[0];
+                    $messages[$messageKey] = $name[0];
                     if (!isset($name[1])) {
                         continue;
                     }
@@ -57,6 +69,27 @@ class ApiRequest extends FormRequest {
             }
         }
 
+        return $messages;
+    }
+
+    protected function simple(): array {
+        $messages = [];
+        $rules = $this->rules();
+        foreach ($rules as $key => $rule) {
+            $list = is_string($rule) ? explode('|', $rule) : $rule;
+
+            foreach ($list as $item) {
+                if (is_object($item)) {
+                    $classname = get_class($item);
+                    $class = substr($classname, strrpos($classname, '\\') + 1);
+                    $messages["$key.$class"] = $class;
+                } else {
+                    $name = explode(':', $item, 2);
+                    $messages["$key.$name[0]"] = $item;
+                }
+            }
+        }
+//dd($messages);
         return $messages;
     }
 
