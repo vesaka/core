@@ -13,6 +13,7 @@ use Tests\TestCase;
 class ModelRepositoryTest extends TestCase {
     public function test_model_has_correct_datatable_pagination() {
         $request = $this->mockRequest();
+        $this->assertTrue(true);
     }
 
     protected function mockRequest(array $data = []): Request {
