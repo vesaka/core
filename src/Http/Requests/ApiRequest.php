@@ -4,7 +4,8 @@ namespace Vesaka\Core\Http\Requests;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Str;
 /**
  * Description of ApiRequest
  *
@@ -47,23 +48,27 @@ class ApiRequest extends FormRequest {
             if (isset($matchedTypes[0])) {
                 $suffix = '.' . $matchedTypes[0];
             }
+
+
             foreach ($list as $item) {
-                if ($item instanceof Rule) {
+                if ($item instanceof ValidationRule) {
                     $classname = get_class($item);
                     $class = substr($classname, strrpos($classname, '\\') + 1);
-                    $messages[$key.'.'.$class . $suffix] = $item->message();
+                    $messages[$key.'.'.$class . $suffix] = Str::kebab($class);
                 } else {
                     $name = explode(':', $item, 2);
                     $messageKey = $key . '.' . $name[0] . $suffix;
                     $messages[$messageKey] = $name[0];
-                    if (!isset($name[1])) {
-                        continue;
-                    }
+                    // if (!isset($name[1])) {
+                    //     continue;
+                    // }
+
+                    $value = isset($name[1]) ? $name[1] : null;
 
                     if (method_exists($this, $name[0])) {
-                        $messages[$messageKey]['value'] = $this->{$name[0]}($name[1]);
+                        $messages[$messageKey] .= ':' . $this->{$name[0]}($value);
                     } else {
-                        $messages[$messageKey]['value'] = $name[1];
+                        $messages[$messageKey] .= ':' . $value;
                     }
                 }
             }
