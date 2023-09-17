@@ -3,7 +3,7 @@
 namespace Vesaka\Core\Models;
 
 use Illuminate\Support\Str;
-use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
+// use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
 
 /**
  * Description of Website
@@ -11,7 +11,7 @@ use Vesaka\Core\Traits\Models\FilepondFeaturedImageTrait;
  * @author vesak
  */
 class Website extends Model {
-    use FilepondFeaturedImageTrait;
+    //use FilepondFeaturedImageTrait;
 
     public function snap($url) {
         if (! empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
