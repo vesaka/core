@@ -24,7 +24,7 @@
             <a :href="getLink(value)" type="button" :class="btn('bg-yellow-600 hover:bg-yellow-100')">
                 <PencilSquareIcon class="w-6 h-6"/>
             </a>
-            <button type="button" :class="btn('bg-red-600 hover:bg-red-700')" @click="f(value.id)">
+            <button type="button" :class="btn('bg-red-600 hover:bg-red-700')" @click="confirmDelete(value.id)">
                 <TrashIcon class="w-6 h-6" />
             </button>
             </div>
@@ -80,9 +80,10 @@
 
     const doSearch = (offset, limit, order, sort) => {
         table.loading = true;
-        if (window.event) {
-            table.page = getPage(window.event);
-        }
+        table.page = offset;
+        // if (window.event) {
+        //     table.page = getPage(window.event);
+        // }
 
         return axios.get(route(`admin::paginate.items`), {
             params: {

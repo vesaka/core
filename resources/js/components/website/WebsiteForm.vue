@@ -1,5 +1,5 @@
 <template>
-    <ModelForm type="website" uploader="filepond">
+    <ModelForm type="website">
         
     </ModelForm>
 </template>

@@ -34,13 +34,15 @@
                     </div>
                 </div>
             </div>
+            <div v-for="field in props.meta">
 
+            </div>
             <slot name="meta"/>
         </div>
         <div>
             <upload-button @click="save" :disabled="loading">
                 <template #after>
-                    Loading...
+                    <span v-if="loading">Loading...</span>
                 </template>
             </upload-button>
         </div>
@@ -58,9 +60,6 @@
     import Categories from './attributes/Categories.vue';
     import FeaturedImage from './attributes/FeaturedImage.vue';
     import FilePond from './attributes/FilePond.vue';
-    import Gallery from './attributes/Gallery.vue';
-    import ValidationMixin from '../mixins/main/validation-mixin';
-    import ClassMixin from '../mixins/main/class-mixin';
     import UploadButton from '../global/UploadButton.vue';
 //    import Spinnner from '../global/Spinner.vue';
     import axios from 'axios';
@@ -82,7 +81,13 @@
         saveUrl: {
             type: String,
             default: '/admin/{type}'
-        }
+        },
+        meta: {
+            type: Array,
+            default: () => {
+                return [];
+            }
+        },
     });
 
     const {notify} = useNotification();
@@ -161,9 +166,7 @@
                 label: category.title,
                 type: isParent ? 'folder' : 'item',
                 checkedStatus: category.id === model.category,
-                data: {
-                    depth
-                },
+                data: { depth },
             };
 
             if (Array.isArray(category.children)) {
@@ -254,10 +257,10 @@
             model[key] = $model[key] || '';
         }
         
-        if (!model.type) {
+        if (!model.id) {
             model.type = props.type;
         }
-        
+
         model.alias = props.alias;
         if (Array.isArray($model.categories)) {
             model.category = $model.categories.map(c => c.id);
