@@ -6,7 +6,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Vesaka\Core\Abstracts\BaseInterface;
-use Vesaka\Core\Http\Requests\Model\SaveDocumentRequest;
+use Vesaka\Core\Http\Requests\Model\StoreModelRequest;
 use Vesaka\Core\Models\Model;
 
 /**
@@ -17,7 +17,7 @@ interface ModelInterface extends BaseInterface {
 
     public function document(string $type): Model;
 
-    public function saveDocument(SaveDocumentRequest $request): Model;
+    public function saveDocument(StoreModelRequest $request): Model;
 
     public function store(Request $request): Model;
 

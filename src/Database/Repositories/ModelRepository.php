@@ -4,12 +4,12 @@ namespace Vesaka\Core\Database\Repositories;
 
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\{Collection, Str};
 use Vesaka\Core\Abstracts\BaseRepository;
 use Vesaka\Core\Database\Interfaces\ModelInterface;
-use Vesaka\Core\Http\Requests\Model\SaveDocumentRequest;
+use Vesaka\Core\Http\Requests\Model\StoreModelRequest;
 use Vesaka\Core\Models\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Description of ModelRepository
@@ -32,7 +32,7 @@ class ModelRepository extends BaseRepository implements ModelInterface {
         return $this->model->firstOrNew(['type' => $type]);
     }
 
-    public function saveDocument(SaveDocumentRequest $request): Model {
+    public function saveDocument(StoreModelRequest $request): Model {
         $document = $this->model->firstOrNew(['type' => $request->type]);
         $document->title = $request->title;
         $document->content = $request->content;

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Vesaka\Core\Abstracts\BaseCache;
 use Vesaka\Core\Database\Interfaces\ModelInterface;
-use Vesaka\Core\Http\Requests\Model\SaveDocumentRequest;
+use Vesaka\Core\Http\Requests\Model\StoreModelRequest;
 use Vesaka\Core\Models\Model;
 
 /**
@@ -28,7 +28,7 @@ class ModelCache extends BaseCache implements ModelInterface {
         return $this->fetch($type);
     }
 
-    public function saveDocument(SaveDocumentRequest $request): Model {
+    public function saveDocument(StoreModelRequest $request): Model {
         return $this->forget($request->type)->refresh();
     }
 
@@ -47,10 +47,12 @@ class ModelCache extends BaseCache implements ModelInterface {
     }
 
     public function mostRecent(string $category = '', int $limit = 10): Collection {
-        return $this->tags($this->model->getType(), 'recent', $category)->fetch();
+        $model = $this->repository->getModel();
+        return $this->tags($model->getType(), 'recent', $category)->fetch();
     }
 
     public function collectByType(string $type = '', $limit = 100): Collection {
-        return $this->tags($type ?? $this->model->getType(), 'list', $limit)->fetch();
+        $model = $this->repository->getModel();
+        return $this->tags($type ?? $model->getType(), 'list', $limit)->fetch();
     }
 }
